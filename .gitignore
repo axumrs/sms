@@ -1,0 +1,9 @@
+/target
+node_modules
+.idea
+.vscode
+.atom
+.DS_Store
+.env
+.env.*
+*.log

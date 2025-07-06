@@ -1,0 +1,18 @@
+[package]
+name = "sms"
+version = "0.1.0"
+edition = "2024"
+authors = ["axum.rs <team@mail.axum.eu.org>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/axumrs/sms"
+homepage = "https://axum.eu.org"
+description = "向axum中文网管理员发送手机短信"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+axum = { version = "0.8", features = [] }
+serde = { version = "1", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+chrono = { version = "0.4", features = ["serde"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "chrono"] }
