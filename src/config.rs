@@ -12,6 +12,8 @@ pub struct Config {
     pub sms_api: String,
     /// 监听地址
     pub addr: String,
+    /// 推送API超时
+    pub sms_api_timeout: u8,
 }
 
 impl Config {
@@ -21,12 +23,14 @@ impl Config {
         let sms_device_key = std::env::var("SMS_DEVICE_KEY")?;
         let sms_api = std::env::var("SMS_API")?;
         let addr = std::env::var("ADDR")?;
+        let sms_api_timeout = std::env::var("SMS_API_TIMEOUT")?.parse()?;
         Ok(Self {
             database_url,
             database_max_conns,
             sms_device_key,
             sms_api,
             addr,
+            sms_api_timeout,
         })
     }
 }

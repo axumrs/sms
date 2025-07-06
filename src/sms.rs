@@ -75,7 +75,7 @@ mod tests {
             },
             &cfg.sms_device_key,
             &cfg.sms_api,
-            10,
+            cfg.sms_api_timeout as u64,
         )
         .await
         .unwrap();
