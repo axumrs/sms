@@ -24,3 +24,6 @@ rust-embed = "8.7"
 mime_guess = "2"
 validator = { version = "0.20", features = ["derive"] }
 xid = "1"
+
+[dev-dependencies]
+tower-http = { version = "0.6", features = ["cors"] }

@@ -8,5 +8,5 @@ Content-Type: application/json
     "subject":"请激活我的账号",
     "message":"你好，我未收到激活邮件，请激活我的账号，谢谢！",
     "group":"用户注册",
-    "captcha":"0000000000000"
+    "captcha":"XXXX.DUMMY.TOKEN.XXXX"
 }

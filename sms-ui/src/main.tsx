@@ -7,19 +7,22 @@ import FrontendLayout from "./layout/Frontend.tsx";
 import BackendLayout from "./layout/Backend.tsx";
 import AdminHomePage from "./pages/admin/Home.tsx";
 import AdminDetailPage from "./pages/admin/Detail.tsx";
+import StateContextProvider from "./contexts/StateContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Router>
-      <Routes>
-        <Route path="/" element={<FrontendLayout />}>
-          <Route index element={<HomePage />} />
-        </Route>
-        <Route path="/a" element={<BackendLayout />}>
-          <Route index element={<AdminHomePage />} />
-          <Route path="d/:id" element={<AdminDetailPage />} />
-        </Route>
-      </Routes>
-    </Router>
+    <StateContextProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<FrontendLayout />}>
+            <Route index element={<HomePage />} />
+          </Route>
+          <Route path="/a" element={<BackendLayout />}>
+            <Route index element={<AdminHomePage />} />
+            <Route path="d/:id" element={<AdminDetailPage />} />
+          </Route>
+        </Routes>
+      </Router>
+    </StateContextProvider>
   </StrictMode>
 );
