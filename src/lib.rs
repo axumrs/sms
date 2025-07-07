@@ -1,3 +1,4 @@
+pub mod asset;
 mod config;
 mod err;
 pub mod sms;
