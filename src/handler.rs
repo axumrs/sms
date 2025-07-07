@@ -1,4 +1,4 @@
-use crate::{Error, Result, db, model, payload, resp, sms};
+use crate::{Error, Result, db, model, payload, resp, sms, turnstile};
 use axum::Json;
 use axum::extract::State;
 use validator::Validate;
@@ -10,7 +10,16 @@ pub async fn send(
     Json(frm): Json<payload::SendMessage>,
 ) -> Result<resp::JsonResp<resp::MessageDetailView>> {
     frm.validate()?;
-    // TODO: 人机验证
+
+    if !turnstile::verify(
+        &state.cfg.turnstile_secret_key,
+        state.cfg.turnstile_timeout,
+        &frm.captcha,
+    )
+    .await?
+    {
+        return Err(Error::from_str("请完成人机验证"));
+    }
 
     let body = format!(r#"{} -- by {}({})"#, frm.message, frm.nickname, frm.email,);
     let title = frm.subject.clone();

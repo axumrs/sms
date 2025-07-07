@@ -8,6 +8,7 @@ pub mod payload;
 mod resp;
 pub mod sms;
 mod state;
+pub mod turnstile;
 
 pub use config::Config;
 pub use err::Error;
