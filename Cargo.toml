@@ -22,3 +22,5 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 rust-embed = "8.7"
 mime_guess = "2"
+validator = { version = "0.20", features = ["derive"] }
+xid = "1"

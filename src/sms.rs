@@ -10,6 +10,7 @@ pub struct Message {
     pub title: String,
     pub group: String,
     pub url: String,
+    pub icon: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -72,6 +73,7 @@ mod tests {
                 title: "AXUM中文网".into(),
                 group: "AXUM".into(),
                 url: "https://axum.eu.org".into(),
+                icon: "https://file.axum.eu.org/asset/logo.png".into(),
             },
             &cfg.sms_device_key,
             &cfg.sms_api,

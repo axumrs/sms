@@ -3,6 +3,20 @@ use axum::response::IntoResponse;
 #[derive(Debug)]
 pub struct Error(anyhow::Error);
 
+impl Error {
+    pub fn code(&self) -> i32 {
+        -1
+    }
+
+    pub fn msg(&self) -> String {
+        self.0.to_string()
+    }
+
+    pub fn from_str(s: impl Into<String>) -> Self {
+        Self(anyhow::anyhow!(s.into()))
+    }
+}
+
 impl<E> From<E> for Error
 where
     E: Into<anyhow::Error>,
