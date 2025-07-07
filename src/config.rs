@@ -14,6 +14,9 @@ pub struct Config {
     pub addr: String,
     /// 推送API超时
     pub sms_api_timeout: u8,
+    pub turnstile_secret_key: String,
+    pub turnstile_site_key: String,
+    pub turnstile_timeout: u8,
 }
 
 impl Config {
@@ -24,6 +27,9 @@ impl Config {
         let sms_api = std::env::var("SMS_API")?;
         let addr = std::env::var("ADDR")?;
         let sms_api_timeout = std::env::var("SMS_API_TIMEOUT")?.parse()?;
+        let turnstile_secret_key = std::env::var("TURNSTILE_SECRET_KEY")?;
+        let turnstile_site_key = std::env::var("TURNSTILE_SITE_KEY")?;
+        let turnstile_timeout = std::env::var("TURNSTILE_TIMEOUT")?.parse()?;
         Ok(Self {
             database_url,
             database_max_conns,
@@ -31,6 +37,9 @@ impl Config {
             sms_api,
             addr,
             sms_api_timeout,
+            turnstile_secret_key,
+            turnstile_site_key,
+            turnstile_timeout,
         })
     }
 }

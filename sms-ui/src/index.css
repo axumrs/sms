@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@layer base {
+  * {
+    @apply text-gray-900;
+  }
+  body {
+    @apply min-h-svh bg-gradient-to-b from-green-100 to-cyan-100;
+  }
+  button {
+    @apply cursor-pointer;
+  }
+  input,
+  textarea {
+    @apply outline-none;
+  }
+}
+
+@layer components {
+  .sms-container {
+    @apply container mx-auto p-1.5;
+  }
+}
