@@ -1,6 +1,6 @@
 use crate::{Error, Result, db, model, payload, resp, sms, turnstile};
 use axum::Json;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use validator::Validate;
 
 use crate::ArcAppState;
@@ -8,7 +8,7 @@ use crate::ArcAppState;
 pub async fn send(
     State(state): State<ArcAppState>,
     Json(frm): Json<payload::SendMessage>,
-) -> Result<resp::JsonResp<resp::MessageDetailView>> {
+) -> Result<resp::JsonResp<resp::IDResp>> {
     frm.validate()?;
 
     if !turnstile::verify(
@@ -21,16 +21,16 @@ pub async fn send(
         return Err(Error::from_str("请完成人机验证"));
     }
 
-    let body = format!(r#"{} -- by {}({})"#, frm.message, frm.nickname, frm.email,);
+    let body = format!(r#"{} -- by {}"#, frm.message, frm.email,);
     let title = frm.subject.clone();
-    let m = model::Message::new(frm.nickname, frm.email, frm.subject, frm.message);
+    let group = frm.group.clone();
+    let m = model::Message::new(frm.email, frm.subject, frm.message, frm.group);
     let action_url = format!("{}{}", &state.cfg.sms_action_url_prefix, &m.id);
-    let view_url = format!("{}{}", &state.cfg.sms_view_url_prefix, &m.id);
     let sms_res = sms::send_message(
         sms::Message {
             body,
             title,
-            group: frm.group,
+            group,
             url: action_url,
             icon: state.cfg.sms_icon.clone(),
         },
@@ -44,5 +44,16 @@ pub async fn send(
     }
 
     db::create_message(&state.pool, &m).await?;
-    Ok(resp::suc(resp::MessageDetailView { url: view_url }).to_json())
+    Ok(resp::suc(resp::IDResp { id: m.id }).to_json())
+}
+
+pub async fn detail(
+    State(state): State<ArcAppState>,
+    Path(id): Path<String>,
+) -> Result<resp::JsonResp<model::Message>> {
+    let m = match db::get_message(&state.pool, &id).await? {
+        Some(v) => v.mark_info(),
+        None => return Err(Error::from_str("不存在的消息")),
+    };
+    Ok(resp::suc(m).to_json())
 }

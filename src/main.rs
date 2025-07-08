@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
-use axum::{Router, routing::post};
-use sms::{AppState, Config, asset, handler};
+use sms::{AppState, Config, router};
 use tokio::net::TcpListener;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -31,10 +30,7 @@ async fn main() -> anyhow::Result<()> {
         pool,
     });
 
-    let app = Router::new()
-        .route("/api/send", post(handler::send))
-        .fallback(asset::static_handler)
-        .with_state(state);
+    let app = router::init(state);
 
     tracing::info!("服务监听于 {:?}", listener.local_addr()?);
 

@@ -3,28 +3,46 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Message {
     pub id: String,
-    pub nickname: String,
     pub email: String,
     pub subject: String,
     pub message: String,
     pub dateline: chrono::DateTime<chrono::Local>,
+    pub group: String,
 }
 
 impl Message {
     pub fn new(
-        nickname: impl Into<String>,
         email: impl Into<String>,
         subject: impl Into<String>,
         message: impl Into<String>,
+        group: impl Into<String>,
     ) -> Self {
         Self {
             id: xid::new().to_string(),
-            nickname: nickname.into(),
             email: email.into(),
             subject: subject.into(),
             message: message.into(),
             dateline: chrono::Local::now(),
+            group: group.into(),
         }
+    }
+
+    pub fn mark_info(self) -> Self {
+        let email = Self::_mark(self.email, 5);
+        Self {
+            id: self.id,
+            email,
+            subject: self.subject,
+            message: self.message,
+            dateline: self.dateline,
+            group: self.group,
+        }
+    }
+    fn _mark(input: String, len: usize) -> String {
+        if input.chars().collect::<Vec<_>>().len() > len {
+            return format!("{}***", utf8_slice::till(&input, len));
+        }
+        input
     }
 }
 

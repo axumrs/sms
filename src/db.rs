@@ -6,15 +6,21 @@ pub async fn create_message<'a>(
     e: impl PgExecutor<'a>,
     m: &'a model::Message,
 ) -> sqlx::Result<&'a str> {
-    sqlx::query(r#"INSERT INTO "messages"("id", "nickname", "email", "subject", "message", "dateline") VALUES ($1, $2, $3, $4, $5, $6)"#)
+    sqlx::query(r#"INSERT INTO "messages"("id", "email", "subject", "message", "dateline","group") VALUES ($1, $2, $3, $4, $5, $6)"#)
         .bind(&m.id)
-        .bind(&m.nickname)
         .bind(&m.email)
         .bind(&m.subject)
         .bind(&m.message)
         .bind(&m.dateline)
+        .bind(&m.group)
         .execute(e).await?;
     Ok(&m.id)
+}
+
+pub async fn get_message(e: impl PgExecutor<'_>, id: &str) -> sqlx::Result<Option<model::Message>> {
+    sqlx::query_as(r#"SELECT "id", "email", "subject", "message", "dateline", "group" FROM "messages" WHERE "id" = $1"#)
+        .bind(id)
+        .fetch_optional(e).await
 }
 
 pub async fn create_message_reply<'a>(

@@ -19,7 +19,6 @@ pub struct Config {
     pub turnstile_timeout: u8,
     pub sms_icon: String,
     pub sms_action_url_prefix: String,
-    pub sms_view_url_prefix: String,
 }
 
 impl Config {
@@ -35,7 +34,7 @@ impl Config {
         let turnstile_timeout = std::env::var("TURNSTILE_TIMEOUT")?.parse()?;
         let sms_icon = std::env::var("SMS_ICON")?;
         let sms_action_url_prefix = std::env::var("SMS_ACTION_URL_PREFIX")?;
-        let sms_view_url_prefix = std::env::var("SMS_VIEW_URL_PREFIX")?;
+
         Ok(Self {
             database_url,
             database_max_conns,
@@ -48,7 +47,6 @@ impl Config {
             turnstile_timeout,
             sms_icon,
             sms_action_url_prefix,
-            sms_view_url_prefix,
         })
     }
 }

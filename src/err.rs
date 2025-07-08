@@ -1,5 +1,7 @@
 use axum::response::IntoResponse;
 
+use crate::resp;
+
 #[derive(Debug)]
 pub struct Error(anyhow::Error);
 
@@ -28,10 +30,6 @@ where
 
 impl IntoResponse for Error {
     fn into_response(self) -> axum::response::Response {
-        (
-            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-            self.0.to_string(),
-        )
-            .into_response()
+        resp::err(self).to_json().into_response()
     }
 }

@@ -1,10 +1,9 @@
-import { Outlet } from "react-router-dom";
+import Header from "./Header";
 
 export default function BackendLayout() {
   return (
     <>
-      <div>BackendLayout</div>
-      <Outlet />
+      <Header isBackend />
     </>
   );
 }

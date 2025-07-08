@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
-use axum::{Router, routing::post};
-use sms::{AppState, Config, asset, handler};
+use sms::{AppState, Config, router};
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -32,16 +31,12 @@ async fn main() -> anyhow::Result<()> {
         pool,
     });
 
-    let app = Router::new()
-        .route("/api/send", post(handler::send))
-        .fallback(asset::static_handler)
-        .with_state(state)
-        .layer(
-            CorsLayer::new()
-                .allow_headers(Any)
-                .allow_methods(Any)
-                .allow_origin(Any),
-        );
+    let app = router::init(state).layer(
+        CorsLayer::new()
+            .allow_headers(Any)
+            .allow_methods(Any)
+            .allow_origin(Any),
+    );
 
     tracing::info!("服务监听于 {:?}", listener.local_addr()?);
 

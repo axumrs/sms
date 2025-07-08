@@ -1,17 +1,15 @@
 @import "tailwindcss";
 
 @layer base {
-  * {
-    @apply text-gray-900;
-  }
   body {
-    @apply min-h-svh bg-gradient-to-b from-green-100 to-cyan-100;
+    @apply min-h-svh bg-gradient-to-b from-green-100 to-cyan-100 text-gray-900;
   }
   button {
     @apply cursor-pointer;
   }
   input,
-  textarea {
+  textarea,
+  select {
     @apply outline-none;
   }
 }
@@ -21,3 +19,5 @@
     @apply container mx-auto p-1.5;
   }
 }
+
+@plugin "@tailwindcss/typography";

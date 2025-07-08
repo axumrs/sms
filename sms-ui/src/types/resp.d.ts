@@ -3,3 +3,7 @@ type ApiResp<T> = {
   msg: string;
   data?: T;
 };
+
+type IdResp = {
+  id: string;
+};

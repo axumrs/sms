@@ -1,30 +1,37 @@
 import { useState, type FormEvent } from "react";
 import TurnstileWidget from "../components/TurnstileWidget";
-import { $post } from "../fetch";
+
 import useStateContext from "../hooks/useStateContext";
+import useFetch from "../hooks/useFetch";
+import { useNavigate } from "react-router-dom";
 
 type FormData = {
-  nickname: string;
   email: string;
   message: string;
   subject: string;
   captcha: string;
-  group: "微信支付" | "用户注册" | "找回密码" | "其它";
+  group?: "微信支付" | "用户注册" | "找回密码" | "其它";
 };
 
 export default function HomePage() {
-  const { $setToast } = useStateContext();
+  const ctx = useStateContext();
+  const { $setToast } = ctx;
   const [data, setData] = useState<FormData>({
-    nickname: "",
     email: "",
     message: "",
     subject: "",
     captcha: "",
-    group: "其它",
+    group: undefined,
   });
+  const { $post } = useFetch<IdResp>(ctx);
+  const navigate = useNavigate();
   const updateValue =
     (key: string) =>
-    (e: FormEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {
+    (
+      e:
+        | FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        | string
+    ) => {
       if (typeof e === "string") {
         setData({
           ...data,
@@ -39,27 +46,30 @@ export default function HomePage() {
     };
 
   const submitHandler = async () => {
-    const nickname = data.nickname.trim();
-    if (!(nickname && nickname.length >= 1 && nickname.length <= 20)) {
-      $setToast("请输入昵称");
+    const subject = data.subject.trim();
+    if (!(subject && subject.length >= 3 && subject.length <= 50)) {
+      $setToast("请输入主题：3~50个字符");
       return;
     }
 
     const email = data.email.trim();
-    if (!(email && email.length >= 1 && email.length <= 255)) {
-      $setToast("请输入邮箱");
+    if (!(email && email.length >= 6 && email.length <= 255)) {
+      $setToast("请输入邮箱：6~255个字符");
       return;
     }
 
-    const subject = data.subject.trim();
-    if (!(subject && subject.length >= 1 && subject.length <= 50)) {
-      $setToast("请输入主题");
+    if (
+      !/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(
+        email
+      )
+    ) {
+      $setToast("请输入正确的邮箱");
       return;
     }
 
     const message = data.message.trim();
-    if (!(message && message.length >= 1 && message.length <= 255)) {
-      $setToast("请输入内容");
+    if (!(message && message.length >= 3 && message.length <= 255)) {
+      $setToast("请输入内容：3~255个字符");
       return;
     }
 
@@ -68,7 +78,16 @@ export default function HomePage() {
       $setToast("请完成人机验证");
       return;
     }
-    await $post("/api/send", data);
+
+    const group = data.group;
+    if (!group) {
+      $setToast("请选择分组");
+      return;
+    }
+    const resp = await $post("/api/send", data);
+    if (resp) {
+      return navigate(`/v/${resp.id}`);
+    }
   };
   return (
     <Form data={data} updateValue={updateValue} onSubmit={submitHandler} />
@@ -83,7 +102,11 @@ function Form({
   data: FormData;
   updateValue: (
     key: string
-  ) => (e: FormEvent<HTMLInputElement | HTMLTextAreaElement> | string) => void;
+  ) => (
+    e:
+      | FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+      | string
+  ) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) {
   const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
@@ -99,41 +122,46 @@ function Form({
       className="bg-white/70 p-4 shadow rounded-md my-3 space-y-4"
       onSubmit={onSubmitHandler}
     >
-      <div className="grid grid-cols-1 gap-y-4 lg:grid-cols-2 lg:gap-x-4 lg:gap-y-0">
-        <label className="flex flex-col gap-y-2 lg:gap-y-0 lg:flex-row lg:items-center lg:gap-x-2">
-          <div className="shrink-0">昵称：</div>
+      <div className="grid grid-cols-1 gap-y-4 lg:grid-cols-5 lg:gap-x-4 lg:gap-y-0">
+        <label className="flex flex-col gap-y-2 lg:col-span-1 lg:gap-y-0 lg:flex-row lg:items-center lg:gap-x-2">
+          <div className="shrink-0">分组：</div>
+          <div className="grow">
+            <select
+              value={data.group}
+              onChange={updateValue("group")}
+              className="rounded px-3 py-1.5 ring ring-gray-400 focus:ring-sky-600 ring-inset w-full block"
+            >
+              <option value={undefined}>--请选择--</option>
+              {["微信支付", "用户注册", "找回密码", "其它"].map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </label>
+        <label className="flex flex-col gap-y-2 lg:col-span-4 lg:gap-y-0 lg:flex-row lg:items-center lg:gap-x-2">
+          <div className="shrink-0">主题：</div>
           <div className="grow">
             <input
               type="text"
-              placeholder="请输入昵称"
+              placeholder="请输入主题"
               className="rounded px-3 py-1.5 ring ring-gray-400 focus:ring-sky-600 ring-inset w-full block"
-              value={data.nickname}
-              onChange={updateValue("nickname")}
-            />
-          </div>
-        </label>
-        <label className="flex flex-col gap-y-2 lg:gap-y-0 lg:flex-row lg:items-center lg:gap-x-2">
-          <div className="shrink-0">邮箱：</div>
-          <div className="grow">
-            <input
-              type="email"
-              placeholder="请输入邮箱"
-              className="rounded px-3 py-1.5 ring ring-gray-400 focus:ring-sky-600 ring-inset w-full block"
-              value={data.email}
-              onChange={updateValue("email")}
+              value={data.subject}
+              onChange={updateValue("subject")}
             />
           </div>
         </label>
       </div>
       <label className="flex flex-col gap-y-2 lg:gap-y-0 lg:flex-row lg:items-center lg:gap-x-2">
-        <div className="shrink-0">主题：</div>
+        <div className="shrink-0">邮箱：</div>
         <div className="grow">
           <input
-            type="text"
-            placeholder="请输入主题"
+            type="email"
+            placeholder="留下你的邮箱，方便回复"
             className="rounded px-3 py-1.5 ring ring-gray-400 focus:ring-sky-600 ring-inset w-full block"
-            value={data.subject}
-            onChange={updateValue("subject")}
+            value={data.email}
+            onChange={updateValue("email")}
           />
         </div>
       </label>
@@ -141,7 +169,7 @@ function Form({
         <div className="shrink-0">内容：</div>
         <div className="grow">
           <textarea
-            placeholder="请输入内容"
+            placeholder="请输入内容（支持Markdown）"
             rows={10}
             className="rounded px-3 py-1.5 ring ring-gray-400 focus:ring-sky-600 ring-inset w-full block"
             value={data.message}
@@ -149,6 +177,7 @@ function Form({
           />
         </div>
       </label>
+
       <label className="flex flex-col gap-y-2 ">
         <div className="shrink-0">人机验证：</div>
         <div className="grow">

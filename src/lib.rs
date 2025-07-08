@@ -6,6 +6,7 @@ pub mod handler;
 pub mod model;
 pub mod payload;
 mod resp;
+pub mod router;
 pub mod sms;
 mod state;
 pub mod turnstile;
