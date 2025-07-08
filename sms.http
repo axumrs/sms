@@ -3,7 +3,6 @@ POST http://127.0.0.1:9527/api/send
 Content-Type: application/json
 
 {
-    "nickname":"AXUM中文网",
     "email":"team@mail.axum.eu.org",
     "subject":"请激活我的账号",
     "message":"你好，我未收到激活邮件，请激活我的账号，谢谢！",

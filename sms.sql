@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS "messages"  (
     "subject" VARCHAR(50) NOT NULL,
     "message" VARCHAR(255) NOT NULL,
     "group" VARCHAR(4) NOT NULL,
-    "dateline" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    "dateline" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "is_reply" BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS "message_replies"  (
@@ -22,6 +23,7 @@ SELECT
     m.message,
     m.dateline,
     m."group",
+    m.is_reply,
     r.id AS reply_id,
     r.content,
     r.dateline AS reply_dateline
@@ -38,6 +40,7 @@ SELECT
     m.message,
     m.dateline,
     m."group",
+    m.is_reply,
     (
         SELECT COUNT(*)
         FROM

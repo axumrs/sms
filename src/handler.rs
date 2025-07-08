@@ -57,3 +57,11 @@ pub async fn detail(
     };
     Ok(resp::suc(m).to_json())
 }
+
+pub async fn message_replies(
+    State(state): State<ArcAppState>,
+    Path(id): Path<String>,
+) -> Result<resp::JsonResp<Vec<model::MessageReply>>> {
+    let replies = db::get_message_replies(&state.pool, &id).await?;
+    Ok(resp::suc(replies).to_json())
+}

@@ -47,7 +47,7 @@ pub struct IDResp {
 
 #[derive(Serialize)]
 pub struct AffResp {
-    pub rows: i64,
+    pub rows: u64,
 }
 
 #[derive(Serialize)]

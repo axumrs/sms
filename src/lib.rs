@@ -1,3 +1,4 @@
+pub mod admin_handler;
 pub mod asset;
 mod config;
 pub mod db;

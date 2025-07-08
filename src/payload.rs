@@ -19,3 +19,37 @@ pub struct SendMessage {
     #[validate(length(min = 1, max = 20, message = "请选择分组"))]
     pub group: String,
 }
+
+#[derive(Deserialize)]
+pub struct AdminListMessage {
+    pub email: Option<String>,
+    pub subject: Option<String>,
+    pub message: Option<String>,
+    pub group: Option<String>,
+    pub is_reply: Option<u8>,
+
+    pub page: Option<u32>,
+    pub page_size: Option<u8>,
+}
+impl AdminListMessage {
+    pub fn is_reply(&self) -> Option<bool> {
+        match self.is_reply {
+            Some(1) => Some(true),
+            Some(0) => Some(false),
+            _ => None,
+        }
+    }
+
+    pub fn page(&self) -> u32 {
+        match self.page {
+            Some(v) => v,
+            None => 0,
+        }
+    }
+}
+
+#[derive(Deserialize, Validate)]
+pub struct CreateMessageReply {
+    #[validate(length(min = 3, max = 255, message = "请输入回复内容"))]
+    pub content: String,
+}

@@ -49,5 +49,17 @@ export default function useFetch<T>(ctx: StateContextProps, noLoading = false) {
     return $fetch(url, { method: "POST", body });
   };
 
-  return { $get, $post };
+  const $put = async (url: string, body?: any) => {
+    return $fetch(url, { method: "PUT", body });
+  };
+
+  const $delete = async (url: string) => {
+    return $fetch(url, { method: "DELETE" });
+  };
+
+  const $patch = async (url: string, body?: any) => {
+    return $fetch(url, { method: "PATCH", body });
+  };
+
+  return { $get, $post, $put, $delete, $patch };
 }
