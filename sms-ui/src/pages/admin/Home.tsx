@@ -8,26 +8,25 @@ import Dialog from "../../components/Dialog";
 import MessageDetailWithReply from "../../components/MessageDetailWithReply";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
+
 dayjs.locale(locale_zh);
 dayjs.extend(relativeTime);
 
 type SearchFormData = {
   email?: string;
   subject?: string;
-  message?: string;
   group?: string;
   is_reply?: 0 | 1;
 
   page_size?: number;
 };
 
-const emptySearchFormData: SearchFormData = {
+const emptyFormData: SearchFormData = {
   email: undefined,
   subject: undefined,
-  message: undefined,
   group: undefined,
   is_reply: undefined,
-  page_size: 1,
+  page_size: 2,
 };
 export default function AdminHomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,7 +35,7 @@ export default function AdminHomePage() {
   const [msgReplies, setMsgReplies] = useState<MessageReply[]>([]);
   const [showSearchPane, setShowSearchPane] = useState<boolean>(false);
   const [formData, setFormData] = useState<SearchFormData>({
-    ...emptySearchFormData,
+    ...emptyFormData,
   });
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
     total: 0,
@@ -45,11 +44,14 @@ export default function AdminHomePage() {
     page_size: 0,
   });
   const [pageNumList, setPageNumList] = useState<number[]>([]);
-  const [page, setPage] = useState(0);
+  // const pageStr = useSearchParam("page") || "0";
+  const [page, setPage] = useState<number>(0);
+  // const nav = useNavigate();
 
   const changeFormDataValue =
     (key: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setPage(0);
       if (key === "group" && e.target.value === "所有分组") {
         setFormData({
           ...formData,
@@ -74,7 +76,10 @@ export default function AdminHomePage() {
   const { $get, $delete } = useFetch<Pagination<Message> | MessageReply[]>(ctx);
 
   const loadData = async () => {
-    const res = await $get("/api/admin/message", { ...formData, page });
+    const res = await $get("/api/admin/message", {
+      ...formData,
+      page,
+    });
     if (res) {
       setMessages((res as Pagination<Message>).data || []);
       setPaginationMeta(res as Pagination<Message>);
@@ -101,8 +106,15 @@ export default function AdminHomePage() {
   };
 
   useEffect(() => {
-    Promise.all([loadData()]);
-  }, []);
+    const cond =
+      !formData.email ||
+      formData.email.length > 2 ||
+      !formData.subject ||
+      formData.subject.length > 2;
+    if (cond) {
+      Promise.all([loadData()]);
+    }
+  }, [formData, page]);
 
   useEffect(() => {
     loadReplices();
@@ -180,14 +192,6 @@ export default function AdminHomePage() {
               <option value={0}>未回复</option>
               <option value={1}>已回复</option>
             </select>
-          </li>
-          <li>
-            <button
-              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300  text-gray-500 "
-              onClick={loadData}
-            >
-              搜索
-            </button>
           </li>
         </ul>
       </section>
@@ -281,7 +285,6 @@ export default function AdminHomePage() {
           value={page}
           onChange={(e) => {
             setPage(Number(e.target.value));
-            loadData();
           }}
         >
           {pageNumList.map((p) => (
@@ -290,7 +293,7 @@ export default function AdminHomePage() {
             </option>
           ))}
         </select>
-        页 - {page} - {JSON.stringify(formData)}
+        页
       </div>
       {detailMsg && (
         <DetailDialog
