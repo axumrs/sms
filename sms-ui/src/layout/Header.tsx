@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 
 export default function Header({ isBackend }: { isBackend?: boolean }) {
   const href = isBackend ? "/a" : "/";
-  const bage = isBackend ? "后台" : null;
+  const bage = isBackend ? "后台" : "免费";
   return (
     <>
       <State>

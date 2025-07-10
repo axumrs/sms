@@ -7,6 +7,7 @@ import locale_zh from "dayjs/locale/zh-cn";
 import Dialog from "../../components/Dialog";
 import MessageDetailWithReply from "../../components/MessageDetailWithReply";
 import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
 dayjs.locale(locale_zh);
 dayjs.extend(relativeTime);
 
@@ -15,6 +16,7 @@ export default function AdminHomePage() {
   const [detailMsg, setDetailMsg] = useState<Message | null>(null);
   const [delMsg, setDelMsg] = useState<Message | null>(null);
   const [msgReplies, setMsgReplies] = useState<MessageReply[]>([]);
+  const [showSearchPane, setShowSearchPane] = useState<boolean>(false);
 
   const ctx = useStateContext();
   const { $get, $delete } = useFetch<Pagination<Message> | MessageReply[]>(ctx);
@@ -54,7 +56,64 @@ export default function AdminHomePage() {
   }, [detailMsg]);
   return (
     <>
-      <section className="bg-white/70 my-6 p-4 space-y-4 rounded-md">
+      <div className="lg:hidden flex justify-end fixed top-4 right-4">
+        <button
+          className="bg-white text-gray-600 rounded-full p-1"
+          onClick={() => setShowSearchPane(!showSearchPane)}
+        >
+          <Search size={20} />
+        </button>
+      </div>
+      <section
+        className={`  bg-white my-6 p-4  rounded-md fixed   left-1/2 -translate-x-1/2 -translate-y-6  z-10 w-11/12 shadow-lg lg:bg-white/70 lg:static lg:shadow-none lg:top-auto lg:left-auto lg:translate-x-0 lg:translate-y-0 lg:z-auto lg:w-auto lg:block  ${
+          showSearchPane ? "block" : "hidden"
+        }`}
+      >
+        <ul className=" grid lg:grid-flow-col gap-4">
+          <li>
+            <input
+              placeholder="邮箱"
+              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500"
+            />
+          </li>
+          <li>
+            <input
+              placeholder="主题"
+              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500"
+            />
+          </li>
+          <li>
+            <input
+              placeholder="消息"
+              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 "
+            />
+          </li>
+          <li>
+            <select className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 text-gray-500">
+              <option value={undefined}>所有分组</option>
+              {["微信支付", "用户注册", "找回密码", "其它"].map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </li>
+          <li>
+            <select className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 text-gray-500">
+              <option value={undefined}>全部</option>
+              <option>未回复</option>
+              <option>已回复</option>
+            </select>
+          </li>
+          <li>
+            <button className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300  text-gray-500 ">
+              搜索
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <section className="bg-white/70 my-6 p-4  rounded-md">
         <div className="overflow-x-auto prose max-w-full">
           <table className="w-full">
             <thead>
