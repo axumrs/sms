@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import useStateContext from "../../hooks/useStateContext";
 import dayjs from "dayjs";
@@ -11,18 +11,61 @@ import { Search } from "lucide-react";
 dayjs.locale(locale_zh);
 dayjs.extend(relativeTime);
 
+type SearchFormData = {
+  email?: string;
+  subject?: string;
+  message?: string;
+  group?: string;
+  is_reply?: 0 | 1;
+  page?: number;
+};
+
+const emptySearchFormData: SearchFormData = {
+  email: undefined,
+  subject: undefined,
+  message: undefined,
+  group: undefined,
+  is_reply: undefined,
+  page: 0,
+};
 export default function AdminHomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [detailMsg, setDetailMsg] = useState<Message | null>(null);
   const [delMsg, setDelMsg] = useState<Message | null>(null);
   const [msgReplies, setMsgReplies] = useState<MessageReply[]>([]);
   const [showSearchPane, setShowSearchPane] = useState<boolean>(false);
+  const [formData, setFormData] = useState<SearchFormData>({
+    ...emptySearchFormData,
+  });
+
+  const changeFormDataValue =
+    (key: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      if (key === "group" && e.target.value === "所有分组") {
+        setFormData({
+          ...formData,
+          [key]: undefined,
+        });
+        return;
+      }
+      if (key === "is_reply" && e.target.value === "全部") {
+        setFormData({
+          ...formData,
+          [key]: undefined,
+        });
+        return;
+      }
+      setFormData({
+        ...formData,
+        [key]: e.target.value || undefined,
+      });
+    };
 
   const ctx = useStateContext();
   const { $get, $delete } = useFetch<Pagination<Message> | MessageReply[]>(ctx);
 
   const loadData = async () => {
-    const res = await $get("/api/admin/message");
+    const res = await $get("/api/admin/message", { ...formData });
     if (res) {
       setMessages((res as Pagination<Message>).data || []);
     }
@@ -74,22 +117,32 @@ export default function AdminHomePage() {
             <input
               placeholder="邮箱"
               className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500"
+              onChange={changeFormDataValue("email")}
+              value={formData.email}
             />
           </li>
           <li>
             <input
+              onChange={changeFormDataValue("subject")}
+              value={formData.subject}
               placeholder="主题"
               className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500"
             />
           </li>
-          <li>
+          {/* <li>
             <input
+              onChange={changeFormDataValue("message")}
+              value={formData.message}
               placeholder="消息"
               className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 "
             />
-          </li>
+          </li> */}
           <li>
-            <select className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 text-gray-500">
+            <select
+              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 text-gray-500"
+              onChange={changeFormDataValue("group")}
+              value={formData.group}
+            >
               <option value={undefined}>所有分组</option>
               {["微信支付", "用户注册", "找回密码", "其它"].map((item) => (
                 <option key={item} value={item}>
@@ -99,14 +152,21 @@ export default function AdminHomePage() {
             </select>
           </li>
           <li>
-            <select className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 text-gray-500">
+            <select
+              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300 placeholder:text-gray-500 text-gray-500"
+              onChange={changeFormDataValue("is_reply")}
+              value={formData.is_reply}
+            >
               <option value={undefined}>全部</option>
-              <option>未回复</option>
-              <option>已回复</option>
+              <option value={0}>未回复</option>
+              <option value={1}>已回复</option>
             </select>
           </li>
           <li>
-            <button className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300  text-gray-500 ">
+            <button
+              className="w-full ring ring-inset px-2 py-0.5 rounded ring-gray-300  text-gray-500 "
+              onClick={loadData}
+            >
               搜索
             </button>
           </li>
@@ -119,6 +179,7 @@ export default function AdminHomePage() {
             <thead>
               <tr>
                 <th>#</th>
+                <th>分组</th>
                 <th>邮箱</th>
                 <th>标题</th>
                 <th>回复</th>
@@ -139,6 +200,7 @@ export default function AdminHomePage() {
                           {item.id.slice(0, 6)}...
                         </div>
                       </td>
+                      <td className="text-nowrap">{item.group}</td>
                       <td>
                         <div className="truncate text-xs lg:text-sm">
                           {item.email}
@@ -193,6 +255,13 @@ export default function AdminHomePage() {
           </table>
         </div>
       </section>
+      <div className="bg-white/70 my-6 p-4  rounded-md flex justify-end">
+        转到第
+        <select className="min-w-12 px-2 py-0.5 ring ring-inset ring-gray-300 rounded mx-1 text-sm">
+          <option>1</option>
+        </select>
+        页
+      </div>
       {detailMsg && (
         <DetailDialog
           msg={detailMsg}
