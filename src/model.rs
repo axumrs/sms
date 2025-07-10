@@ -110,7 +110,7 @@ impl<T> Pagination<T>
 where
     T: Serialize + DeserializeOwned,
 {
-    pub fn new_with_page_size(total: i64, page: u32, page_size: u8, data: Vec<T>) -> Self {
+    pub fn new(total: i64, page: u32, page_size: u8, data: Vec<T>) -> Self {
         let page_total = (total as f64 / page_size as f64).ceil() as u32;
         Self {
             total,
@@ -119,13 +119,6 @@ where
             page_size,
             data,
         }
-    }
-    pub fn new(total: i64, page: u32, data: Vec<T>) -> Self {
-        Self::new_with_page_size(total, page, DEFAULT_PAGE_SIZE, data)
-    }
-
-    pub fn with_count(count: (i64,), page: u32, data: Vec<T>) -> Self {
-        Self::new(count.0, page, data)
     }
 
     pub fn limit(&self) -> i64 {

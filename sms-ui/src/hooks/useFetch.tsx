@@ -42,6 +42,7 @@ export default function useFetch<T>(ctx: StateContextProps, noLoading = false) {
   };
 
   const $get = async (url: string, params?: Record<string, any>) => {
+    console.log(params);
     const fullUrl = params ? `${url}?${qs.stringify(params)}` : url;
     return $fetch(fullUrl, { method: "GET" });
   };

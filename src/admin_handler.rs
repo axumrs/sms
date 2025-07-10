@@ -26,7 +26,7 @@ pub async fn message_list(
     let data = db::list_messages_data(&mut *tx, &f, page as i64, page_size as i64).await?;
     tx.commit().await?;
 
-    Ok(resp::suc(model::Pagination::with_count(count, page, data)).to_json())
+    Ok(resp::suc(model::Pagination::new(count.0, page, page_size, data)).to_json())
 }
 
 pub async fn message_detail(

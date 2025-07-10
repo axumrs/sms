@@ -17,7 +17,8 @@ type SearchFormData = {
   message?: string;
   group?: string;
   is_reply?: 0 | 1;
-  page?: number;
+
+  page_size?: number;
 };
 
 const emptySearchFormData: SearchFormData = {
@@ -26,7 +27,7 @@ const emptySearchFormData: SearchFormData = {
   message: undefined,
   group: undefined,
   is_reply: undefined,
-  page: 0,
+  page_size: 1,
 };
 export default function AdminHomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,6 +38,14 @@ export default function AdminHomePage() {
   const [formData, setFormData] = useState<SearchFormData>({
     ...emptySearchFormData,
   });
+  const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
+    total: 0,
+    page_total: 0,
+    page: 0,
+    page_size: 0,
+  });
+  const [pageNumList, setPageNumList] = useState<number[]>([]);
+  const [page, setPage] = useState(0);
 
   const changeFormDataValue =
     (key: string) =>
@@ -65,9 +74,10 @@ export default function AdminHomePage() {
   const { $get, $delete } = useFetch<Pagination<Message> | MessageReply[]>(ctx);
 
   const loadData = async () => {
-    const res = await $get("/api/admin/message", { ...formData });
+    const res = await $get("/api/admin/message", { ...formData, page });
     if (res) {
       setMessages((res as Pagination<Message>).data || []);
+      setPaginationMeta(res as Pagination<Message>);
     }
   };
 
@@ -97,6 +107,15 @@ export default function AdminHomePage() {
   useEffect(() => {
     loadReplices();
   }, [detailMsg]);
+
+  useEffect(() => {
+    let pnl: number[] = [];
+    for (let i = 0; i < paginationMeta.page_total; i++) {
+      pnl.push(i);
+    }
+    setPageNumList(pnl);
+  }, [paginationMeta]);
+
   return (
     <>
       <div className="lg:hidden flex justify-end fixed top-4 right-4">
@@ -257,10 +276,21 @@ export default function AdminHomePage() {
       </section>
       <div className="bg-white/70 my-6 p-4  rounded-md flex justify-end">
         转到第
-        <select className="min-w-12 px-2 py-0.5 ring ring-inset ring-gray-300 rounded mx-1 text-sm">
-          <option>1</option>
+        <select
+          className="min-w-12 px-2 py-0.5 ring ring-inset ring-gray-300 rounded mx-1 text-sm"
+          value={page}
+          onChange={(e) => {
+            setPage(Number(e.target.value));
+            loadData();
+          }}
+        >
+          {pageNumList.map((p) => (
+            <option key={`page-num-${p}`} value={p}>
+              {p + 1}
+            </option>
+          ))}
         </select>
-        页
+        页 - {page} - {JSON.stringify(formData)}
       </div>
       {detailMsg && (
         <DetailDialog
