@@ -26,7 +26,7 @@ const emptyFormData: SearchFormData = {
   subject: undefined,
   group: undefined,
   is_reply: undefined,
-  page_size: 2,
+  page_size: undefined,
 };
 export default function AdminHomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -278,23 +278,25 @@ export default function AdminHomePage() {
           </table>
         </div>
       </section>
-      <div className="bg-white/70 my-6 p-4  rounded-md flex justify-end">
-        转到第
-        <select
-          className="min-w-12 px-2 py-0.5 ring ring-inset ring-gray-300 rounded mx-1 text-sm"
-          value={page}
-          onChange={(e) => {
-            setPage(Number(e.target.value));
-          }}
-        >
-          {pageNumList.map((p) => (
-            <option key={`page-num-${p}`} value={p}>
-              {p + 1}
-            </option>
-          ))}
-        </select>
-        页
-      </div>
+      {paginationMeta.page_total > 1 && (
+        <div className="bg-white/70 my-6 p-4  rounded-md flex justify-end">
+          转到第
+          <select
+            className="min-w-12 px-2 py-0.5 ring ring-inset ring-gray-300 rounded mx-1 text-sm"
+            value={page}
+            onChange={(e) => {
+              setPage(Number(e.target.value));
+            }}
+          >
+            {pageNumList.map((p) => (
+              <option key={`page-num-${p}`} value={p}>
+                {p + 1}
+              </option>
+            ))}
+          </select>
+          页
+        </div>
+      )}
       {detailMsg && (
         <DetailDialog
           msg={detailMsg}
