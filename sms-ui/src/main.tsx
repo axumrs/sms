@@ -9,6 +9,7 @@ import AdminHomePage from "./pages/admin/Home.tsx";
 import AdminDetailPage from "./pages/admin/Detail.tsx";
 import StateContextProvider from "./contexts/StateContext.tsx";
 import DetailPage from "./pages/Detail.tsx";
+import AdminLoginPage from "./pages/AdminLogin.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,6 +24,9 @@ createRoot(document.getElementById("root")!).render(
             <Route index element={<AdminHomePage />} />
             <Route path="v/:id" element={<AdminDetailPage />} />
           </Route>
+        </Routes>
+        <Routes>
+          <Route path="/admin-login" element={<AdminLoginPage />} />
         </Routes>
       </Router>
     </StateContextProvider>

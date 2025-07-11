@@ -19,7 +19,7 @@ export default function Toast({
   if (!show) return <></>;
   return (
     <div
-      className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/90 rounded-lg text-white p-6 shadow ${className}`}
+      className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/90 rounded-lg text-white p-6 shadow z-[99999] ${className}`}
     >
       {children}
     </div>

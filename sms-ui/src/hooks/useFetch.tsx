@@ -1,6 +1,15 @@
 import qs from "qs";
-export default function useFetch<T>(ctx: StateContextProps, noLoading = false) {
-  const { $setIsLoading, $setToast } = ctx;
+export default function useFetch<T>(
+  ctx: StateContextProps,
+  extOpts?: {
+    noLoading?: boolean;
+    $auth?: AdminAuth;
+  }
+) {
+  const noLoading = extOpts?.noLoading || false;
+  const { $setIsLoading, $setToast, $setAdminJwtExpired } = ctx;
+  const { token: $token } = (extOpts?.$auth || {}) as AdminAuth;
+  const authorization = $token ? `Bearer ${$token}` : "";
 
   const _fetch = <T,>(url: string, init?: FetchProps) => {
     const fullUrl = `${import.meta.env.VITE_API_URL}${url}`;
@@ -9,6 +18,7 @@ export default function useFetch<T>(ctx: StateContextProps, noLoading = false) {
       ...init,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        Authorization: authorization,
       },
       body: init?.body ? JSON.stringify(init?.body) : undefined,
     })
@@ -25,6 +35,11 @@ export default function useFetch<T>(ctx: StateContextProps, noLoading = false) {
         ...init,
       });
       if (res.code !== 0) {
+        if (res.msg.startsWith("JWT:")) {
+          // 重新登录
+          $setAdminJwtExpired(true);
+          throw new Error(res.msg.replace("JWT:", ""));
+        }
         throw new Error(res.msg);
       }
       return res.data;

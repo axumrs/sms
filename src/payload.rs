@@ -53,3 +53,12 @@ pub struct CreateMessageReply {
     #[validate(length(min = 3, max = 255, message = "请输入回复内容"))]
     pub content: String,
 }
+
+#[derive(Deserialize, Validate)]
+pub struct AdminLogin {
+    #[validate(length(min = 6, message = "请输入密码"))]
+    pub password: String,
+
+    #[validate(length(min = 6, message = "请完成人机验证"))]
+    pub captcha: String,
+}

@@ -13,6 +13,7 @@ export default function MessageDetail({
   isAdmin,
   onDelete,
   onClear,
+  auth,
 }: {
   msg: Message;
   className?: string;
@@ -20,10 +21,11 @@ export default function MessageDetail({
   isAdmin?: boolean;
   onDelete?: () => void;
   onClear?: () => void;
+  auth?: AdminAuth;
 }) {
   const [delReply, setDelReply] = useState<MessageReply | null>(null);
   const [clearReply, setClearReply] = useState<boolean>(false);
-  const { $delete } = useFetch<any>(useStateContext());
+  const { $delete } = useFetch<any>(useStateContext(), { $auth: auth });
 
   const handleDelete = async () => {
     if (!delReply) {

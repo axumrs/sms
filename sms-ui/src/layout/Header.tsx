@@ -1,4 +1,4 @@
-import State from "./State";
+import State from "../components/State";
 import { Link, Outlet } from "react-router-dom";
 
 export default function Header({ isBackend }: { isBackend?: boolean }) {

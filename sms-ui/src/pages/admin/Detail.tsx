@@ -3,11 +3,15 @@ import MessageDetailWithReply from "../../components/MessageDetailWithReply";
 import useFetch from "../../hooks/useFetch";
 import useStateContext from "../../hooks/useStateContext";
 import { useEffect, useState } from "react";
+import getAuthStorage from "../../getAuthStorage";
 
 export default function AdminDetailPage() {
   const ctx = useStateContext();
   const { id } = useParams();
-  const { $get } = useFetch<Message | MessageReply[]>(ctx);
+
+  const [$auth] = getAuthStorage();
+
+  const { $get } = useFetch<Message | MessageReply[]>(ctx, { $auth });
   const [msg, setMsg] = useState<Message | null>(null);
   const [msgReplies, setMsgReplies] = useState<MessageReply[]>([]);
 
@@ -45,6 +49,7 @@ export default function AdminDetailPage() {
         replies={msgReplies}
         onDelete={loadReplices}
         onClear={loadReplices}
+        auth={$auth}
       />
     </>
   );

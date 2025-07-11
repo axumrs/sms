@@ -7,6 +7,8 @@ const StateContext = createContext<StateContextProps>({
   $setMsg: () => {},
   $isLoading: false,
   $setIsLoading: () => {},
+  $adminJwtExpired: false,
+  $setAdminJwtExpired: () => {},
 });
 
 export default function StateContextProvider({
@@ -22,6 +24,9 @@ export default function StateContextProvider({
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const $setIsLoading = (isLoading: boolean) => setIsLoading(isLoading);
+
+  const [adminJwtExpired, setAdminJwtExpired] = useState<boolean>(false);
+  const $setAdminJwtExpired = (expired: boolean) => setAdminJwtExpired(expired);
   return (
     <StateContext.Provider
       value={{
@@ -31,6 +36,8 @@ export default function StateContextProvider({
         $setMsg,
         $isLoading: isLoading,
         $setIsLoading,
+        $adminJwtExpired: adminJwtExpired,
+        $setAdminJwtExpired,
       }}
     >
       {children}

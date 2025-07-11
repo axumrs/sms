@@ -8,6 +8,7 @@ import Dialog from "../../components/Dialog";
 import MessageDetailWithReply from "../../components/MessageDetailWithReply";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
+import getAuthStorage from "../../getAuthStorage";
 
 dayjs.locale(locale_zh);
 dayjs.extend(relativeTime);
@@ -47,6 +48,7 @@ export default function AdminHomePage() {
   // const pageStr = useSearchParam("page") || "0";
   const [page, setPage] = useState<number>(0);
   // const nav = useNavigate();
+  const [$auth] = getAuthStorage();
 
   const changeFormDataValue =
     (key: string) =>
@@ -73,7 +75,11 @@ export default function AdminHomePage() {
     };
 
   const ctx = useStateContext();
-  const { $get, $delete } = useFetch<Pagination<Message> | MessageReply[]>(ctx);
+
+  const { $get, $delete } = useFetch<Pagination<Message> | MessageReply[]>(
+    ctx,
+    { $auth }
+  );
 
   const loadData = async () => {
     const res = await $get("/api/admin/message", {
@@ -312,6 +318,7 @@ export default function AdminHomePage() {
           onClear={() => {
             Promise.all([loadData(), loadReplices()]);
           }}
+          auth={$auth}
         />
       )}
       {delMsg && (
@@ -333,6 +340,7 @@ function DetailDialog({
   replies,
   onDelete,
   onClear,
+  auth,
 }: {
   msg: Message;
   onClose?: () => void;
@@ -341,6 +349,7 @@ function DetailDialog({
   replies: MessageReply[];
   onDelete?: () => void;
   onClear?: () => void;
+  auth?: AdminAuth;
 }) {
   return (
     <>
@@ -357,6 +366,7 @@ function DetailDialog({
             replies={replies}
             onDelete={onDelete}
             onClear={onClear}
+            auth={auth}
           />
         </div>
 

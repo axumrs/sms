@@ -12,6 +12,7 @@ export default function MessageDetailWithReply({
   replies = [],
   onDelete,
   onClear,
+  auth,
 }: {
   msg: Message;
   ctx: StateContextProps;
@@ -19,9 +20,10 @@ export default function MessageDetailWithReply({
   replies?: MessageReply[];
   onDelete?: () => void;
   onClear?: () => void;
+  auth?: AdminAuth;
 }) {
   const { $setToast } = ctx;
-  const { $post } = useFetch<IdResp>(ctx);
+  const { $post } = useFetch<IdResp>(ctx, { $auth: auth });
 
   const [reply, setReply] = useState<CreateReply>({
     content: "",
@@ -53,6 +55,7 @@ export default function MessageDetailWithReply({
         isAdmin
         onDelete={onDelete}
         onClear={onClear}
+        auth={auth}
       />
       <div className="bg-white/70 my-4 p-4  space-y-4 rounded-md">
         <div>

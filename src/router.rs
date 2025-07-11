@@ -1,14 +1,15 @@
 use axum::{
-    Router,
+    Router, middleware,
     routing::{delete, get, post},
 };
 
-use crate::{ArcAppState, admin_handler, asset, handler};
+use crate::{ArcAppState, admin_handler, asset, auth_handler, handler, mid};
 
 pub fn init(state: ArcAppState) -> Router {
     Router::new()
         .nest("/api", init_frontend(state.clone()))
         .nest("/api/admin", init_backend(state.clone()))
+        .nest("/api/auth", init_auth(state.clone()))
         .fallback(asset::static_handler)
 }
 
@@ -37,5 +38,15 @@ fn init_backend(state: ArcAppState) -> Router {
             "/reply/{id}/{message_id}",
             delete(admin_handler::del_message_reply),
         )
+        .layer(middleware::from_extractor_with_state::<
+            mid::AdminAuth,
+            ArcAppState,
+        >(state.clone()))
+        .with_state(state)
+}
+
+fn init_auth(state: ArcAppState) -> Router {
+    Router::new()
+        .route("/admin-login", post(auth_handler::admin_login))
         .with_state(state)
 }

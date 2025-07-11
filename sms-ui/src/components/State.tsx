@@ -1,5 +1,5 @@
-import Loading from "../components/Loading";
-import Toast from "../components/Toast";
+import Loading from "./Loading";
+import Toast from "./Toast";
 import useStateContext from "../hooks/useStateContext";
 
 export default function State({ children }: ComponentProps) {

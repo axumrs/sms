@@ -19,6 +19,9 @@ pub struct Config {
     pub turnstile_timeout: u8,
     pub sms_icon: String,
     pub sms_action_url_prefix: String,
+    pub jwt_secret: String,
+    pub jwt_exp: usize,
+    pub admin_password: String,
 }
 
 impl Config {
@@ -34,6 +37,9 @@ impl Config {
         let turnstile_timeout = std::env::var("TURNSTILE_TIMEOUT")?.parse()?;
         let sms_icon = std::env::var("SMS_ICON")?;
         let sms_action_url_prefix = std::env::var("SMS_ACTION_URL_PREFIX")?;
+        let jwt_secret = std::env::var("JWT_SECRET")?;
+        let jwt_exp = std::env::var("JWT_EXP")?.parse()?;
+        let admin_password = std::env::var("ADMIN_PASSWORD")?;
 
         Ok(Self {
             database_url,
@@ -47,6 +53,9 @@ impl Config {
             turnstile_timeout,
             sms_icon,
             sms_action_url_prefix,
+            jwt_secret,
+            jwt_exp,
+            admin_password,
         })
     }
 }
