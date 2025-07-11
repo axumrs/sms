@@ -31,14 +31,14 @@ pub async fn list_messages_data(
     page_size: i64,
 ) -> sqlx::Result<Vec<model::Message>> {
     let mut q = sqlx::QueryBuilder::new(
-        r#"SELECT "id", "email", "subject", "message", "dateline", "group", "is_reply" FROM "messages" WHERE 1=1"#,
+        r#"SELECT "id", "email", "subject", "message", "dateline", "group", "is_reply" FROM "messages"  WHERE 1=1"#,
     );
 
     build_list_messages_query(&mut q, &f);
 
     let order = match &f.order {
         Some(v) => v,
-        None => "id DESC",
+        None => "dateline DESC, id DESC",
     };
     q.push(r#" ORDER BY "#)
         .push_bind(order)
