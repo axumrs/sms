@@ -15,7 +15,7 @@ export default function AdminLogin() {
   const [_, $setAuth] = getAuthStorage();
 
   const [formData, setFormData] = useState({
-    password: "axum.eu.org",
+    password: "",
     captcha: "",
   });
 

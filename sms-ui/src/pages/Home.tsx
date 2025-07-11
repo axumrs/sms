@@ -3,7 +3,7 @@ import TurnstileWidget from "../components/TurnstileWidget";
 
 import useStateContext from "../hooks/useStateContext";
 import useFetch from "../hooks/useFetch";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 type FormData = {
   email: string;
@@ -16,15 +16,54 @@ type FormData = {
 export default function HomePage() {
   const ctx = useStateContext();
   const { $setToast } = ctx;
+  const { email: $email, orderId: $orderId, action: $action } = useParams();
+  const subject = () => {
+    if ($orderId) {
+      return `订单'${$orderId}'已完成支付`;
+    }
+    if ($action === "active") {
+      return "激活账号";
+    }
+    if ($action === "reset") {
+      return "重置密码";
+    }
+    return "";
+  };
+  const group = () => {
+    if ($orderId) {
+      return "微信支付";
+    }
+    if ($action === "active") {
+      return "用户注册";
+    }
+    if ($action === "reset") {
+      return "找回密码";
+    }
+    return undefined;
+  };
+
+  const message = () => {
+    if ($orderId) {
+      return `您好，订单 \`${$orderId}\` 已完成支付，请尽快通过审核，谢谢！`;
+    }
+    if ($action === "active") {
+      return "您好，我没收到激活账号的验证码，**并且已经发送过邮件到激活邮箱**，请尽快帮我激活账号，谢谢！";
+    }
+    if ($action === "reset") {
+      return "您好，我没收到重置密码的验证码，**并且已经发送过邮件到激活邮箱**，请尽快帮我重置密码，谢谢！";
+    }
+    return "";
+  };
   const [data, setData] = useState<FormData>({
-    email: "",
-    message: "",
-    subject: "",
+    email: $email || "",
+    message: message() || "",
+    subject: subject() || "",
     captcha: "",
-    group: undefined,
+    group: group(),
   });
   const { $post } = useFetch<IdResp>(ctx);
   const navigate = useNavigate();
+
   const updateValue =
     (key: string) =>
     (
@@ -32,6 +71,13 @@ export default function HomePage() {
         | FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
         | string
     ) => {
+      if (key === "group" && e === "--请选择--") {
+        setData({
+          ...data,
+          group: undefined,
+        });
+        return;
+      }
       if (typeof e === "string") {
         setData({
           ...data,
@@ -80,7 +126,8 @@ export default function HomePage() {
     }
 
     const group = data.group;
-    if (!group) {
+    // @ts-ignore
+    if (!group || group === "--请选择--") {
       $setToast("请选择分组");
       return;
     }

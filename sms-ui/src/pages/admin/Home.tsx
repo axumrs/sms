@@ -223,10 +223,12 @@ export default function AdminHomePage() {
                     <tr key={item.id}>
                       <td>
                         <div className="truncate uppercase text-xs hidden lg:block">
-                          {item.id}
+                          <Link to={`/a/v/${item.id}`}>{item.id}</Link>
                         </div>
                         <div className="truncate uppercase text-xs lg:hidden">
-                          {item.id.slice(0, 6)}...
+                          <Link to={`/a/v/${item.id}`}>
+                            {item.id.slice(0, 6)}...
+                          </Link>
                         </div>
                       </td>
                       <td className="text-nowrap">{item.group}</td>
