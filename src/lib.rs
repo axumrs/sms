@@ -3,6 +3,7 @@ pub mod asset;
 pub mod auth_handler;
 mod config;
 pub mod db;
+pub mod email;
 mod err;
 pub mod handler;
 pub mod jwt;

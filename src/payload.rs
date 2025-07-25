@@ -48,10 +48,20 @@ impl AdminListMessage {
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, Debug)]
 pub struct CreateMessageReply {
     #[validate(length(min = 3, max = 255, message = "请输入回复内容"))]
     pub content: String,
+    pub send_email: Option<bool>,
+}
+
+impl CreateMessageReply {
+    pub fn send_email(&self) -> bool {
+        match self.send_email {
+            Some(v) => v,
+            None => false,
+        }
+    }
 }
 
 #[derive(Deserialize, Validate)]

@@ -4,6 +4,7 @@ import useFetch from "../hooks/useFetch";
 
 type CreateReply = {
   content: string;
+  send_email:boolean;
 };
 export default function MessageDetailWithReply({
   msg,
@@ -27,6 +28,7 @@ export default function MessageDetailWithReply({
 
   const [reply, setReply] = useState<CreateReply>({
     content: "",
+    send_email:true,
   });
 
   const handleSubmit = async () => {
@@ -40,6 +42,7 @@ export default function MessageDetailWithReply({
       await $post(`/api/admin/message/${msg.id}/reply`, reply);
       setReply({
         content: "",
+        send_email:true,
       });
       onDone();
     } catch (error) {
@@ -71,13 +74,16 @@ export default function MessageDetailWithReply({
             }}
           ></textarea>
         </div>
-        <div className="lg:flex lg:justify-end">
-          <button
+        <div className="lg:flex lg:justify-end lg:items-center lg:gap-x-2">
+          <label className="flex itemc-center gap-x-1">
+            <input type="checkbox" checked={reply.send_email} onChange={e=>setReply({...reply, send_email:e.target.checked})} />
+            <span>邮件回复</span></label>
+         <div> <button
             className="w-full bg-gray-900 text-white px-2 py-1.5 rounded-md lg:w-auto"
             onClick={handleSubmit}
           >
             回复消息
-          </button>
+          </button></div>
         </div>
       </div>
     </>

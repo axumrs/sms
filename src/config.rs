@@ -22,6 +22,9 @@ pub struct Config {
     pub jwt_secret: String,
     pub jwt_exp: usize,
     pub admin_password: String,
+    pub mail_smtp: String,
+    pub mail_user: String,
+    pub mail_password: String,
 }
 
 impl Config {
@@ -40,6 +43,9 @@ impl Config {
         let jwt_secret = std::env::var("JWT_SECRET")?;
         let jwt_exp = std::env::var("JWT_EXP")?.parse()?;
         let admin_password = std::env::var("ADMIN_PASSWORD")?;
+        let mail_smtp = std::env::var("MAIL_SMTP")?;
+        let mail_user = std::env::var("MAIL_USER")?;
+        let mail_password = std::env::var("MAIL_PASSWORD")?;
 
         Ok(Self {
             database_url,
@@ -56,6 +62,9 @@ impl Config {
             jwt_secret,
             jwt_exp,
             admin_password,
+            mail_smtp,
+            mail_user,
+            mail_password,
         })
     }
 }

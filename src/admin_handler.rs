@@ -4,7 +4,7 @@ use axum::{
 };
 use validator::Validate;
 
-use crate::{ArcAppState, Error, Result, db, model, payload, resp};
+use crate::{ArcAppState, Error, Result, db, email, model, payload, resp};
 
 pub async fn message_list(
     State(state): State<ArcAppState>,
@@ -60,9 +60,12 @@ pub async fn reply_message(
 ) -> Result<resp::JsonResp<resp::IDResp>> {
     frm.validate()?;
 
+    let send_email = true; //frm.send_email();
+
     let mut tx = state.pool.begin().await?;
 
     let msg_id = id.clone();
+    let reply_content = frm.content.clone();
     let m = model::MessageReply::new(id, frm.content);
     if let Err(e) = db::create_message_reply(&mut *tx, &m).await {
         tx.rollback().await?;
@@ -72,6 +75,45 @@ pub async fn reply_message(
     if let Err(e) = db::update_message_is_replied(&mut *tx, &msg_id, true).await {
         tx.rollback().await?;
         return Err(e.into());
+    }
+
+    if send_email {
+        // 读取内容
+        let msg = match db::get_message(&mut *tx, &msg_id).await {
+            Ok(v) => {
+                if let Some(v) = v {
+                    v
+                } else {
+                    tx.rollback().await?;
+                    return Err(Error::from_str("不存在的消息"));
+                }
+            }
+            Err(e) => {
+                tx.rollback().await?;
+                return Err(e.into());
+            }
+        };
+        // 构建邮件内容
+        let email_title = format!("AXUM中文网回复: {}", msg.subject);
+        let email_content = format!(
+            "{}\n\n\n-------你发送的信息-------\n{}\n\n\n本邮件由系统自动发送，请勿回复。",
+            reply_content, msg.message
+        );
+        let email_to = msg.email.clone();
+        // 发送邮件
+        let mail_user = state.cfg.mail_user.clone();
+        let mail_smtp = state.cfg.mail_smtp.clone();
+        let mail_password = state.cfg.mail_password.clone();
+        tokio::spawn(async move {
+            let m = email::Data {
+                subject: email_title,
+                body: email_content,
+                to: email_to,
+            };
+            if let Err(e) = email::send(mail_smtp, mail_user, mail_password, m).await {
+                eprintln!("发送邮件失败：{:?}", e);
+            }
+        });
     }
 
     tx.commit().await?;
