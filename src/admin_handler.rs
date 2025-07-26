@@ -60,7 +60,7 @@ pub async fn reply_message(
 ) -> Result<resp::JsonResp<resp::IDResp>> {
     frm.validate()?;
 
-    let send_email = true; //frm.send_email();
+    let send_email = frm.send_email();
 
     let mut tx = state.pool.begin().await?;
 
@@ -111,7 +111,7 @@ pub async fn reply_message(
                 to: email_to,
             };
             if let Err(e) = email::send(mail_smtp, mail_user, mail_password, m).await {
-                eprintln!("发送邮件失败：{:?}", e);
+                tracing::error!("发送邮件失败：{:?}", e);
             }
         });
     }

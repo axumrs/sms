@@ -13,7 +13,7 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn to_message(&self, mail_user: &str) -> Result<Message> {
+    pub fn to_message(self, mail_user: &str) -> Result<Message> {
         let user = mail_user.parse().map_err(Error::from)?;
         let to = self.to.parse().map_err(Error::from)?;
         Message::builder()
@@ -21,7 +21,7 @@ impl Data {
             .to(to)
             .subject(self.subject.as_str())
             .header(ContentType::TEXT_PLAIN)
-            .body(self.body.clone())
+            .body(self.body)
             .map_err(Error::from)
     }
 }
